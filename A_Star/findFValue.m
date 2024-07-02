@@ -2,8 +2,8 @@ function [cost, heuristic, posinds] = findFValue(posind, costsofar, field, ...
           goalind, heuristicmethod)
     n = length(field);
     % 将父节点和终止点索引值拓展成坐标值
-    [currentpos(1) currentpos(2)] = ind2sub([n n], posind);
-    [goalpos(1) goalpos(2)] = ind2sub([n n], goalind);
+    [currentpos(1), currentpos(2)] = ind2sub([n n], posind);
+    [goalpos(1), goalpos(2)] = ind2sub([n n], goalind);
     % 4个方向, 所以是4行, pos是2列指一个点的位置用x和y表示
     cost = Inf * ones(4, 1);
     heuristic = Inf * ones(4, 1);
