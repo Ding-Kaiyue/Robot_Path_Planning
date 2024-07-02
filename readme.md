@@ -13,7 +13,7 @@
 
 #### Simulation Results
 
-<img src="img/Astar.png" alt="Astar" style="zoom: 80%;" />
+![A star](img/Astar.png)
 
 ## RRT star
 
