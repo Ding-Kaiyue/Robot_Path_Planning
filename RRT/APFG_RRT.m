@@ -1,5 +1,3 @@
-% Goal-bias RRT 
-
 clearvars
 close all
 addpath('function')
