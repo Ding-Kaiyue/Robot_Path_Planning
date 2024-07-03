@@ -34,35 +34,94 @@
 
 We can find that the path is generally satisfactory.
 
-## RRT based on target probability  sampling
+## Goal-bias RRT
 
 #### Algorithm Flow
 
-1. Pick a random node q_rand, and the q_rand takes the target point with a probability of 0.2. The probability should between 0.05 to 0.3. The higher the probability, the faster the search speed; the higher the probability of failing to find an existing path. This step ensures that the tree grows towards the target node.
-2. Find the closest node q_near from explored nodes to branch out from, towards q_rand.
-3. Steer from q_near towards q_rand: interpolate if node is too far away, reach q_new. Check that obstacle is not hit.
-4. Add q_new to node list.
+1. Pick a random node `q_rand`, and the `q_rand` takes the target point with a probability of 0.2. The probability should between `0.05 to 0.3`. The higher the probability, the faster the search speed; the higher the probability of failing to find an existing path. This step ensures that the tree grows towards the target node.
+2. Find the closest node `q_near` from explored nodes to branch out from, towards `q_rand`.
+3. Steer from `q_near` towards `q_rand`: interpolate if node is too far away, reach `q_new`. Check that obstacle is not hit.
+4. Add `q_new` to node list.
 5. Continue until maximum number of nodes is reached or goal is hit.
 
 #### Simulation Results
 
-![RRT based on target probability sampling](img/TargetRRT.png)
+![RRT based on target probability sampling](img/Goal_bias_RRT.png)
 
 We can find that the side branches are few, but the path is not absolutely optimal.
 
-## Path Clipping of RRT based on target probability  sampling
+## Path Clipping of Goal-bias RRT
 
 #### Algorithm Flow
 
-1. Pick a random node q_rand, and the q_rand takes the target point with a probability of 0.2. The probability should between 0.05 to 0.3. The higher the probability, the faster the search speed; the higher the probability of failing to find an existing path. This step ensures that the tree grows towards the target node.
-2. Find the closest node q_near from explored nodes to branch out from, towards q_rand.
-3. Steer from q_near towards q_rand: interpolate if node is too far away, reach q_new. Check that obstacle is not hit.
-4. Add q_new to node list.
+1. Pick a random node `q_rand`, and the `q_rand` takes the target point with a probability of 0.2. The probability should between `0.05 to 0.3`. The higher the probability, the faster the search speed; the higher the probability of failing to find an existing path. This step ensures that the tree grows towards the target node.
+2. Find the closest node `q_near` from explored nodes to branch out from, towards `q_rand`.
+3. Steer from `q_near` towards `q_rand`: interpolate if node is too far away, reach `q_new`. Check that obstacle is not hit.
+4. Add `q_new` to node list.
 5. Continue until maximum number of nodes is reached or goal is hit.
-6. Search in reverse order to make sure there are no redundant paths, if so, connect the q_end node to its grandparent node.
+6. Search in reverse order to make sure there are no redundant paths, if so, connect the `q_end `node to its `grandparent node`.
 
 #### Simulation Results
 
 ![Path Clipping](img/PathClipping.png)
 
 This is the simplest planning path.
+
+## APFG-RRT
+
+#### Algorithm Flow
+
+1. Initialize `$P=P_{max}$`, `local_minima = false`.
+
+2. Pick  a random node `q_rand`, and the `q_rand` takes the target point with a probability of `P`.
+
+3. Find the closest node `q_near` from explored nodes to branch out from, towards `q_rand`.
+
+4. Find the closest point on the obstacle `o_near`, which is the closest to `q_near`
+
+5. Calculate `x_new`, the meaning of each parameter in the formula is shown in the code comments.
+
+   * $$
+     x_{new} = x_{near}+\epsilon \frac{x_{rand} - x_{near}}{d(x_{rand}, x_{near})} + \phi\frac{\boldsymbol{F}_{total}}{|\boldsymbol{F}_{total}|}
+     $$
+
+   * $$
+     \boldsymbol{F}_{total} = \boldsymbol{F}_{alt}+\boldsymbol{F}_{rep}
+     $$
+
+   * $$
+     \boldsymbol{F}_{alt} = F_{alt}^*\frac{q_{goal} - q_{near}}{d(q_{goal}, q_{near})} \\
+     $$
+
+   * $$
+     \boldsymbol{F}_{rep} = \left\{
+     \begin{array}{l}
+     \frac{F_{rep}^*}{1+e^{(2|\boldsymbol{d}_{min}|/d_{rep}^*-1)k}}\frac{\boldsymbol{d}_{min}}{|\boldsymbol{d}_{min}|} & |\boldsymbol{d}_{min}| \leq d_{rep}^* \\
+     0 & |\boldsymbol{d}_{min}| > d_{rep}^*
+     \end{array}
+     \right.
+     $$
+
+   * $$
+     \boldsymbol{d}_{min} = q_{near} - o_{near}
+     $$
+
+6. Check if `q_new` and `q_rand` is hit on the obstacle. If it is not hit, add `q_new` to node list. Then judge if `x_rand` is `x_goal`, if yes, $P = P_{max}$ and let `local_minima` is false. If it is hit on the obstacle, then judge if `x_rand` is `x_goal` , if yes, let $n=0$ and `local_minima` is true. 
+
+7. When `local_minima` is true, update probability as follows:
+
+   * $$
+     P = P_{max}(1-e^{-kn/n^*})
+     $$
+
+   * $$
+     n=n+1
+     $$
+
+8. Continue until maximum number of nodes is reached or goal is hit.
+
+#### Simulation Results
+
+![APFG_RRT](img/APFG_RRT.png)
+
+This algorithm solves the problem that the Goal-bias algorithm is prone to falling into local minima and cannot escape. You can change the parameters to observe the algorithm effect.
