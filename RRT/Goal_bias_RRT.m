@@ -48,21 +48,17 @@ for i = 1:numNodes
     q_near = nodes(idx);
 
     q_new.coord = steer(q_rand, q_near.coord, val, EPS);
-    if noCollision(q_rand, q_near.coord, obstacle1) ...
-    && noCollision(q_rand, q_near.coord, obstacle2) ...
-    && noCollision(q_rand, q_near.coord, obstacle3)
+    if noCollision(q_new.coord, q_near.coord, obstacle1) ...
+    && noCollision(q_new.coord, q_near.coord, obstacle2) ...
+    && noCollision(q_new.coord, q_near.coord, obstacle3)
         line([q_near.coord(1), q_new.coord(1)], [q_near.coord(2), q_new.coord(2)], 'Color', 'k', 'LineWidth', 2);
         drawnow
         hold on
         q_new.cost = dist(q_new.coord, q_near.coord) + q_near.cost;
-        for j = 1:length(nodes)
-            if nodes(j).coord == q_near.coord
-                q_new.parent = j;
-            end
-        end
+        q_new.parent = idx;
+           
         nodes = [nodes q_new];
-
-        if q_goal.coord(1) - q_new.coord(1) < EPS && q_goal.coord(2) - q_new.coord(2) < EPS
+        if dist(q_goal.coord, q_new.coord) < EPS
             line([q_new.coord(1), q_goal.coord(1)], [q_new.coord(2), q_goal.coord(2)], 'Color', 'k', 'LineWidth', 2);
             drawnow
             hold on
