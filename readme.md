@@ -125,3 +125,20 @@ This is the simplest planning path.
 ![APFG_RRT](img/APFG_RRT.png)
 
 This algorithm solves the problem that the Goal-bias algorithm is prone to falling into local minima and cannot escape. You can change the parameters to observe the algorithm effect.
+
+## RRT-Connect
+
+#### Algorithm Flow
+
+1. **Initialization**: Create two trees, one starting from the initial state and the other from the goal state.
+2. **Expansion**: In each iteration, randomly sample a point from each tree and extend the nearest node towards the sampled point by a certain distance. This gradually expands the trees until a path between the two trees is connected.
+3. **Connection**: When nodes from both trees are close enough, attempt to connect them to form a path. The connection process typically involves checking if the path avoids obstacles and performing collision detection.
+4. **Iteration**: Repeat the expansion and connection steps until a feasible path from the initial state to the goal state is found, or until a predefined number of iterations is reached.
+5. **Path Extraction**: If a connection between the two trees is successful, extract the path from the initial state to the goal state by tracing back through the connected nodes.
+
+RRT-Connect is effective for high-dimensional configuration spaces and is particularly suitable for scenarios where the exact planning problem is complex and needs efficient exploration of the state space.
+
+#### Simulation Results
+
+![RRT-Connect](img/RRTconnect.png)
+
